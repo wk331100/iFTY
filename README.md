@@ -1,1 +1,1 @@
-# iFTY
+# iFTY Is short for infinity
