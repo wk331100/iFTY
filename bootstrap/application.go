@@ -41,15 +41,3 @@ func (app *Application) bootstrap ()  {
 func (app *Application) Run () {
 	app.bootstrap()
 }
-
-func fooHandler(ctx *fasthttp.RequestCtx){
-	ctx.Success("application/json",[]byte("hello Application/json"))
-}
-
-func barHandler(ctx *fasthttp.RequestCtx){
-	ctx.Success("text/html",[]byte("text/html"))
-}
-
-func errHandler(ctx *fasthttp.RequestCtx){
-	ctx.Error("not found", fasthttp.StatusNotFound)
-}
