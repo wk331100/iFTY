@@ -3,15 +3,16 @@ package route
 import (
 	"github.com/wk331100/iFTY/app/controllers"
 	"github.com/wk331100/iFTY/app/controllers/admin"
+	Route "github.com/wk331100/iFTY/system/route"
 )
 
 type ApiRoute struct {}
 
-func (api *ApiRoute) Map() []Map{
-	route := new(Route)
+func (api *ApiRoute) Map() []Route.Map {
+	route := new(Route.Route)
 
 	//配置静态路由
-	indexController := new(controllers.Index)
+	indexController := new(controllers.IndexController)
 	route.Get("/hello", indexController.Index)
 	route.Post("/hello", indexController.Post)
 

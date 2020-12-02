@@ -5,19 +5,21 @@ import (
 	"github.com/valyala/fasthttp"
 	"github.com/wk331100/iFTY/config"
 	"github.com/wk331100/iFTY/route"
+	"github.com/wk331100/iFTY/system/helper"
+	"strconv"
 )
 
 type Application struct {}
 
 func (app *Application) bootstrap ()  {
 	//加载系统配置文件
-	config := config.ServerConfig
+	configs := config.ServerConfig
 	//加载路由
 	apiRoute := route.ApiRoute{}
 	apiMap := apiRoute.Map()
 
 	requestHandler := func(ctx *fasthttp.RequestCtx) {
-		fmt.Println("+++++++++")
+		fmt.Println("Request: ", string(ctx.Path()), " ", string(ctx.Method()))
 		if len(apiMap) <= 0 {
 			ctx.Error("Unsupported path", fasthttp.StatusNotFound)
 		}
@@ -34,10 +36,21 @@ func (app *Application) bootstrap ()  {
 		}
 
 	}
-	addr := fmt.Sprintf(":%d", config["Port"].(int))
+	addr := fmt.Sprintf(":%d", configs["Port"].(int))
+	app.PrintWelcome(configs["Port"].(int))
 	fasthttp.ListenAndServe(addr, requestHandler)
 }
 
 func (app *Application) Run () {
 	app.bootstrap()
+}
+
+func (app *Application) PrintWelcome (port int){
+	fmt.Println("+-------------------------------------------------------+")
+	fmt.Println("|                          iFTY                         |")
+	fmt.Println("|       Is A Web Api Framework Short For Infinity       |")
+	fmt.Println("|-------------------------------------------------------|")
+	fmt.Println("| Status: ",helper.Green("Running!"),"                                    |")
+	fmt.Println("| Listening Port: ", helper.Green(strconv.Itoa(port)), "                                |")
+	fmt.Println("+-------------------------------------------------------+")
 }

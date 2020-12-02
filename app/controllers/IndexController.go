@@ -2,14 +2,31 @@ package controllers
 
 import (
 	"github.com/valyala/fasthttp"
+	"github.com/wk331100/iFTY/system/helper"
+	"github.com/wk331100/iFTY/system/http/request"
+	"github.com/wk331100/iFTY/system/http/response"
 )
 
-type Index struct {}
+type IndexController struct {}
 
-func (index *Index) Index(ctx *fasthttp.RequestCtx){
-	ctx.Success("application/json",[]byte("Index Application/json"))
+func (index *IndexController) Index(ctx *fasthttp.RequestCtx){
+	params := request.Input(ctx)
+	name := params.String("name")
+	age := params.Int("age")
+	data := helper.Map{
+		"Name" : name,
+		"Age" : age,
+	}
+	response.Json(data, ctx)
 }
 
-func (index *Index) Post(ctx *fasthttp.RequestCtx){
-	ctx.Success("application/json",[]byte("Post Application/json"))
+func (index *IndexController) Post(ctx *fasthttp.RequestCtx){
+	params := request.Input(ctx)
+	name := params.String("name")
+	age := params.Int("age")
+	data := helper.Map{
+		"Name" : name,
+		"Age" : age,
+	}
+	response.Json(data, ctx)
 }
