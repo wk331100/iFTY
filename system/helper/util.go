@@ -1,6 +1,9 @@
 package helper
 
-import "strconv"
+import (
+	"bytes"
+	"strconv"
+)
 
 type Map map[string]interface{}
 
@@ -35,4 +38,20 @@ func (m *Map) Interface(str string) interface{}{
 		return mapStruct[str]
 	}
 	return nil
+}
+
+
+func Implode(glue string, pieces []interface{}) string {
+	var buf bytes.Buffer
+	l := len(pieces)
+	for _, str := range pieces {
+		if val, ok := str.(int); ok{
+			str = strconv.Itoa(val)
+		}
+		buf.WriteString(str.(string))
+		if l--; l > 0 {
+			buf.WriteString(glue)
+		}
+	}
+	return buf.String()
 }

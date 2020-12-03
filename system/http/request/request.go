@@ -14,8 +14,8 @@ func Input(ctx *fasthttp.RequestCtx) helper.Map {
 	if len(query) > 0 {
 		parseQuery(query, &params)
 	}
-	//Form Data
 
+	//Form Data
 	if formData,err := ctx.MultipartForm(); err == nil{
 		for key, item := range (*formData).Value{
 			if len(item) == 1{
@@ -26,9 +26,9 @@ func Input(ctx *fasthttp.RequestCtx) helper.Map {
 		}
 	}
 
+	//form urlencoded
 	formEncodeString := ctx.PostArgs().String()
 	if formEncodeString != ""{
-		fmt.Println("__________")
 		parseQuery(formEncodeString, &params)
 	}
 

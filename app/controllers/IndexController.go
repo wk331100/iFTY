@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/valyala/fasthttp"
+	"github.com/wk331100/iFTY/app/models"
 	"github.com/wk331100/iFTY/system/helper"
 	"github.com/wk331100/iFTY/system/http/request"
 	"github.com/wk331100/iFTY/system/http/response"
@@ -13,6 +14,7 @@ func (index *IndexController) Index(ctx *fasthttp.RequestCtx){
 	params := request.Input(ctx)
 	name := params.String("name")
 	age := params.Int("age")
+
 	data := helper.Map{
 		"Name" : name,
 		"Age" : age,
@@ -25,8 +27,13 @@ func (index *IndexController) Post(ctx *fasthttp.RequestCtx){
 	name := params.String("name")
 	age := params.Int("age")
 	data := helper.Map{
-		"Name" : name,
-		"Age" : age,
+		"username" : name,
+		"password" : age,
 	}
+	testData := helper.Map{
+		"name" : "hahahahahah",
+	}
+	new(models.UserModel).Insert(data)
+	new(models.TestModel).Insert(testData)
 	response.Json(data, ctx)
 }
