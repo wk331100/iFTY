@@ -25,3 +25,12 @@ func (this *TestModel) Insert(data helper.Map) int {
 func (this *TestModel) Delete(data helper.Map) bool {
 	return this.getInstance().Table(this.table).Where(data).Delete()
 }
+
+func (this *TestModel) List(where helper.Map) []helper.Map {
+	return this.getInstance().Table(this.table).Where(where).Get()
+}
+
+func (this *TestModel) Info(where helper.Map) helper.Map {
+	return this.getInstance().Table(this.table).Where(where).First()
+}
+

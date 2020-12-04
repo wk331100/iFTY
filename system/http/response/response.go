@@ -6,7 +6,7 @@ import (
 	"github.com/wk331100/iFTY/system/helper"
 )
 
-func Json(data helper.Map, ctx *fasthttp.RequestCtx)  {
+func Json(data interface{}, ctx *fasthttp.RequestCtx)  {
 	response := helper.Map{
 		"Code" : fasthttp.StatusOK,
 		"Msg" : "成功",

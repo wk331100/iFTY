@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/valyala/fasthttp"
 	"github.com/wk331100/iFTY/app/models"
 	"github.com/wk331100/iFTY/system/helper"
@@ -30,11 +31,17 @@ func (index *IndexController) Post(ctx *fasthttp.RequestCtx){
 		"username" : name,
 		"password" : age,
 	}
-	testData := helper.Map{
-		"name" : "hahahahahah",
+	fmt.Println(data)
+	//testData := helper.Map{
+	//	"name" : "abc123",
+	//}
+	filter := helper.Map{
+		"name" : "abc123",
 	}
 	//new(models.UserModel).Insert(data)
-	new(models.TestModel).Insert(testData)
-	new(models.TestModel).Delete(testData)
-	response.Json(data, ctx)
+	//new(models.TestModel).Insert(testData)
+	//new(models.TestModel).Delete(testData)
+	//result := new(models.TestModel).List(filter)
+	result := new(models.TestModel).Info(filter)
+	response.Json(result, ctx)
 }

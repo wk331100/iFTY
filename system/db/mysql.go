@@ -6,6 +6,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/wk331100/iFTY/config"
 	"github.com/wk331100/iFTY/system/helper"
+	"log"
 )
 
 const MASTER = "master"
@@ -22,7 +23,9 @@ type Mysql struct {
 	Connector       *sql.DB
 	TableName 	string
 	Filter []Filter
-	Column []string
+	Column []interface{}
+	pageSize int
+	page int
 }
 
 type Filter struct {
@@ -61,7 +64,10 @@ func (this *Mysql) IsConnected() bool {
 }
 
 func (this *Mysql)Table(table string) *Mysql {
+	appConfig := config.AppConfig
 	this.TableName = table
+	this.page = 1
+	this.pageSize = appConfig["pageSize"].(int)
 	return this
 }
 
@@ -103,14 +109,12 @@ func (this *Mysql)Delete() bool {
 	if len(this.Filter) < 0 {
 		return false
 	}
-	filter := []interface{}{}
-	for _,item := range this.Filter  {
-		filter = append(filter, fmt.Sprintf("`%s` %s '%v'",item.key, item.condition, item.value))
-	}
-
-	sql += helper.Implode(" AND " , filter)
+	filter, vals := this.parseFilter()
+	sql += filter
 	fmt.Println(sql)
-	_,err := this.Connector.Exec(sql)
+	stmt,_ := this.Connector.Prepare(sql)
+	defer stmt.Close()
+	_, err := stmt.Exec(vals...)
 	if err != nil {
 		fmt.Printf("Delete data error: %v\n", err)
 		return false
@@ -118,10 +122,100 @@ func (this *Mysql)Delete() bool {
 	return true
 }
 
+func (this *Mysql) Get() []helper.Map {
+	sql, vals := this.buildQuerySQL()
+	stmt,_ := this.Connector.Prepare(sql)
+	defer stmt.Close()
+	rows, err := stmt.Query(vals...)
+	if err != nil {
+		fmt.Printf("Select data error: %v\n", err)
+		return nil
+	}
+	return this.parseResult(rows)
+}
+
+func (this *Mysql) First() helper.Map {
+	this.pageSize = 1
+	this.page = 1
+	sql, vals := this.buildQuerySQL()
+	stmt,_ := this.Connector.Prepare(sql)
+	defer stmt.Close()
+	rows, err := stmt.Query(vals...)
+	if err != nil {
+		fmt.Printf("Select data error: %v\n", err)
+		return nil
+	}
+	results := this.parseResult(rows)
+	return results[0]
+}
+func (this *Mysql) buildQuerySQL() (string, []interface{}){
+	sql := "SELECT "
+	if len(this.Column) <= 0{
+		sql += " * "
+	} else {
+		columnStr := helper.Implode(",", this.Column)
+		sql += columnStr
+	}
+	filter,vals := this.parseFilter()
+	sql += " FROM `" + this.TableName + "` WHERE " + filter + " " + this.parseLimit()
+	fmt.Println(sql)
+	return sql, vals
+}
 
 
+func (this *Mysql) parseResult(rows *sql.Rows) []helper.Map {
 
-func (this *Mysql)Where(filter helper.Map) *Mysql {
+	cols,_ := rows.Columns()
+	vals := make([]interface{}, len(cols))
+	scans := make([]interface{}, len(cols))
+	for i := range vals{
+		scans[i] = &vals[i]
+	}
+	var result = []helper.Map{}
+
+	for rows.Next()  {
+		err := rows.Scan(scans...)
+		if err != nil{
+			log.Fatalln(err)
+		}
+
+		row := helper.Map{}
+		for k, v := range vals{
+			key := cols[k]
+			row[key] = v
+		}
+		result = append(result, row)
+	}
+	return result
+}
+
+
+func (this *Mysql) parseLimit() string {
+	start := (this.page - 1) * this.pageSize
+	return fmt.Sprintf("LIMIT %d,%d", start, this.pageSize)
+}
+
+func (this *Mysql) parseFilter() (string,[]interface{}) {
+	filter := []interface{}{}
+	vals := []interface{}{}
+	for _,item := range this.Filter  {
+		filter = append(filter, fmt.Sprintf("`%s` %s ?",item.key, item.condition))
+		vals = append(vals, item.value.(string))
+	}
+	return helper.Implode(" AND " , filter), vals
+}
+
+func (this *Mysql) Page (page int) *Mysql {
+	this.page = page
+	return this
+}
+
+func (this *Mysql) PageSize (pageSize int) *Mysql {
+	this.pageSize = pageSize
+	return this
+}
+
+func (this *Mysql) Where(filter helper.Map) *Mysql {
 	for key,val := range filter  {
 		filterStruct := Filter{
 			key:       key,
