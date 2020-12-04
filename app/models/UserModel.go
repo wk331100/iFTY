@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"github.com/wk331100/iFTY/system/db"
 	"github.com/wk331100/iFTY/system/helper"
 )
@@ -13,6 +14,7 @@ type UserModel struct {
 func (this *UserModel) getInstance() *db.Mysql{
 	this.table = "user"
 	if this.Connector == nil || !this.Connector.IsConnected() {
+		fmt.Println("+++++++++++")
 		this.Connector =  new(db.Mysql).Connect()
 	}
 	return this.Connector

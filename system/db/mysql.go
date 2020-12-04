@@ -4,26 +4,49 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/wk331100/iFTY/config"
 	"github.com/wk331100/iFTY/system/helper"
 )
 
+const MASTER = "master"
+const SLAVE = "slave"
+const COND_EQ = "="
+const COND_LESS = "<"
+const COND_LESS_OR_EQ = "<="
+const COND_GREATER = ">"
+const COND_GREATER_OR_EQ = ">="
 
 type Mysql struct {
 	//mysql data source name
 	Address string
 	Connector       *sql.DB
 	TableName 	string
+	Filter []Filter
+	Column []string
+}
+
+type Filter struct {
+	key string
+	value interface{}
+	condition string
 }
 
 func (this *Mysql)Connect() *Mysql {
-	fmt.Println("Mysql Connecting ……")
-	this.Address = "root:Wk331100!@tcp(192.168.126.100:3306)/blog"
+	return this.ConnectCluster(MASTER)
+}
+
+func (this *Mysql)ConnectCluster(cluster string) *Mysql {
+	mysqlConfig := config.MysqlConfig
+	if mysqlConfig[cluster] == nil {
+		panic("Error Cluster !" )
+	}
+	config := mysqlConfig[cluster].(helper.Map)
+	this.Address = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", config["username"],config["password"],config["host"],config["port"],config["dbname"])
 	conn, err := sql.Open("mysql", this.Address)
 	this.Connector = conn
 
 	if err != nil || conn.Ping() != nil {
 		fmt.Println("Mysql Connecting Failed!")
-		panic(err)
 		return nil
 	}
 	fmt.Println("Mysql Connected")
@@ -38,13 +61,12 @@ func (this *Mysql) IsConnected() bool {
 }
 
 func (this *Mysql)Table(table string) *Mysql {
-	DB := this.Connect()
-	DB.TableName = table
-	return DB
+	this.TableName = table
+	return this
 }
 
 func (this *Mysql)Insert(insertData helper.Map) int {
-	sql := "INSERT INTO " + this.TableName;
+	sql := "INSERT INTO " + this.TableName
 	if len(insertData) <= 0 {
 		return 0
 	}
@@ -58,22 +80,56 @@ func (this *Mysql)Insert(insertData helper.Map) int {
 		vals[i] = val
 		i++
 	}
-	fields := helper.Implode(",", keys)
+	columns := helper.Implode(",", keys)
 	marks := helper.Implode(",", mark)
-	sql += "(" + fields + ") VALUES (" + marks + ")"
+	sql += "(" + columns + ") VALUES (" + marks + ")"
 
-	fmt.Println(sql)
-	prepare, _ := this.Connector.Prepare(sql)
-	defer prepare.Close()
+	stmt, _ := this.Connector.Prepare(sql)
+	defer stmt.Close()
 
-	ret, err := prepare.Exec(vals...)
+	ret, err := stmt.Exec(vals...)
 	if err != nil {
 		fmt.Printf("insert data error: %v\n", err)
 		return 0
 	}
 	if LastInsertId, err := ret.LastInsertId(); nil == err {
-		fmt.Println("LastInsertId:", LastInsertId)
 		return int(LastInsertId)
 	}
 	return 0;
+}
+
+func (this *Mysql)Delete() bool {
+	sql := "DELETE FROM `" + this.TableName + "` WHERE "
+	if len(this.Filter) < 0 {
+		return false
+	}
+	filter := []interface{}{}
+	for _,item := range this.Filter  {
+		filter = append(filter, fmt.Sprintf("`%s` %s '%v'",item.key, item.condition, item.value))
+	}
+
+	sql += helper.Implode(" AND " , filter)
+	fmt.Println(sql)
+	_,err := this.Connector.Exec(sql)
+	if err != nil {
+		fmt.Printf("Delete data error: %v\n", err)
+		return false
+	}
+	return true
+}
+
+
+
+
+func (this *Mysql)Where(filter helper.Map) *Mysql {
+	for key,val := range filter  {
+		filterStruct := Filter{
+			key:       key,
+			value:     val,
+			condition: COND_EQ,
+		}
+		this.Filter = append(this.Filter, filterStruct)
+		fmt.Println(this.Filter)
+	}
+	return this
 }

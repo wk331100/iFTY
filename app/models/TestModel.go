@@ -21,3 +21,7 @@ func (this *TestModel) getInstance() *db.Mysql{
 func (this *TestModel) Insert(data helper.Map) int {
 	return this.getInstance().Table(this.table).Insert(data)
 }
+
+func (this *TestModel) Delete(data helper.Map) bool {
+	return this.getInstance().Table(this.table).Where(data).Delete()
+}

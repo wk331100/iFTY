@@ -33,7 +33,8 @@ func (index *IndexController) Post(ctx *fasthttp.RequestCtx){
 	testData := helper.Map{
 		"name" : "hahahahahah",
 	}
-	new(models.UserModel).Insert(data)
+	//new(models.UserModel).Insert(data)
 	new(models.TestModel).Insert(testData)
+	new(models.TestModel).Delete(testData)
 	response.Json(data, ctx)
 }
