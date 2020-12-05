@@ -34,11 +34,11 @@ type Filter struct {
 	condition string
 }
 
-func (this *Mysql)Connect() *Mysql {
+func (this *Mysql) Connect() *Mysql {
 	return this.ConnectCluster(MASTER)
 }
 
-func (this *Mysql)ConnectCluster(cluster string) *Mysql {
+func (this *Mysql) ConnectCluster(cluster string) *Mysql {
 	mysqlConfig := config.MysqlConfig
 	if mysqlConfig[cluster] == nil {
 		panic("Error Cluster !" )
@@ -63,7 +63,7 @@ func (this *Mysql) IsConnected() bool {
 	return true
 }
 
-func (this *Mysql)Table(table string) *Mysql {
+func (this *Mysql) Table(table string) *Mysql {
 	appConfig := config.AppConfig
 	this.TableName = table
 	this.page = 1
@@ -71,7 +71,7 @@ func (this *Mysql)Table(table string) *Mysql {
 	return this
 }
 
-func (this *Mysql)Insert(insertData helper.Map) int {
+func (this *Mysql) Insert(insertData helper.Map) int {
 	sql := "INSERT INTO " + this.TableName
 	if len(insertData) <= 0 {
 		return 0
@@ -104,7 +104,35 @@ func (this *Mysql)Insert(insertData helper.Map) int {
 	return 0;
 }
 
-func (this *Mysql)Delete() bool {
+func (this *Mysql) Update(updateData helper.Map) int {
+	sql := "UPDATE `" + this.TableName + "`"
+	if len(updateData) <= 0 {
+		return 0
+	}
+
+	setter, setVals := this.parseSet(updateData)
+	sql += " SET " + setter
+
+	filter, vals := this.parseFilter()
+	sql += " WHERE " + filter
+
+	fmt.Println(sql)
+	stmt,_ := this.Connector.Prepare(sql)
+	defer stmt.Close()
+	vals = helper.ArrayMerge(setVals, vals)
+	fmt.Println(vals)
+	ret, err := stmt.Exec(vals...)
+	if err != nil {
+		fmt.Printf("Delete data error: %v\n", err)
+		return 0
+	}
+	affectedNum, _ := ret.RowsAffected()
+	return int(affectedNum)
+}
+
+
+
+func (this *Mysql) Delete() bool {
 	sql := "DELETE FROM `" + this.TableName + "` WHERE "
 	if len(this.Filter) < 0 {
 		return false
@@ -138,16 +166,24 @@ func (this *Mysql) First() helper.Map {
 	this.pageSize = 1
 	this.page = 1
 	sql, vals := this.buildQuerySQL()
+	fmt.Println(vals)
 	stmt,_ := this.Connector.Prepare(sql)
 	defer stmt.Close()
+	fmt.Println("++++++++++++")
+	fmt.Println(vals)
 	rows, err := stmt.Query(vals...)
+	fmt.Println("===========")
 	if err != nil {
 		fmt.Printf("Select data error: %v\n", err)
 		return nil
 	}
 	results := this.parseResult(rows)
-	return results[0]
+	if len(results) > 0 {
+		return results[0]
+	}
+	return helper.Map{}
 }
+
 func (this *Mysql) buildQuerySQL() (string, []interface{}){
 	sql := "SELECT "
 	if len(this.Column) <= 0{
@@ -164,7 +200,6 @@ func (this *Mysql) buildQuerySQL() (string, []interface{}){
 
 
 func (this *Mysql) parseResult(rows *sql.Rows) []helper.Map {
-
 	cols,_ := rows.Columns()
 	vals := make([]interface{}, len(cols))
 	scans := make([]interface{}, len(cols))
@@ -200,9 +235,19 @@ func (this *Mysql) parseFilter() (string,[]interface{}) {
 	vals := []interface{}{}
 	for _,item := range this.Filter  {
 		filter = append(filter, fmt.Sprintf("`%s` %s ?",item.key, item.condition))
-		vals = append(vals, item.value.(string))
+		vals = append(vals, item.value)
 	}
 	return helper.Implode(" AND " , filter), vals
+}
+
+func (this *Mysql) parseSet(sets helper.Map) (string,[]interface{}) {
+	keys := []interface{}{}
+	vals := []interface{}{}
+	for key,val := range sets  {
+		keys = append(keys, fmt.Sprintf("`%s` = ?", key))
+		vals = append(vals, val)
+	}
+	return helper.Implode(" , " , keys), vals
 }
 
 func (this *Mysql) Page (page int) *Mysql {
@@ -223,7 +268,6 @@ func (this *Mysql) Where(filter helper.Map) *Mysql {
 			condition: COND_EQ,
 		}
 		this.Filter = append(this.Filter, filterStruct)
-		fmt.Println(this.Filter)
 	}
 	return this
 }

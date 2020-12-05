@@ -35,13 +35,20 @@ func (index *IndexController) Post(ctx *fasthttp.RequestCtx){
 	//testData := helper.Map{
 	//	"name" : "abc123",
 	//}
+	update := helper.Map{
+		"name" : "update123",
+		"age" : 16,
+	}
 	filter := helper.Map{
 		"name" : "abc123",
+		"age" : 18,
 	}
 	//new(models.UserModel).Insert(data)
 	//new(models.TestModel).Insert(testData)
 	//new(models.TestModel).Delete(testData)
 	//result := new(models.TestModel).List(filter)
-	result := new(models.TestModel).Info(filter)
+	//result := new(models.TestModel).Info(filter)
+	result := new(models.TestModel).Update(update, filter)
 	response.Json(result, ctx)
+
 }
