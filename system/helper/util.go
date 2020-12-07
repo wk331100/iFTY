@@ -3,6 +3,7 @@ package helper
 import (
 	"bytes"
 	"strconv"
+	"strings"
 )
 
 type Map map[string]interface{}
@@ -54,6 +55,24 @@ func Implode(glue string, pieces []interface{}) string {
 		}
 	}
 	return buf.String()
+}
+
+
+func ImplodeString(glue string, pieces []string) string {
+	var buf bytes.Buffer
+	l := len(pieces)
+	for _, str := range pieces {
+		buf.WriteString(str)
+		if l--; l > 0 {
+			buf.WriteString(glue)
+		}
+	}
+	return buf.String()
+}
+
+
+func Explode(delimiter, str string) []string {
+	return strings.Split(str, delimiter)
 }
 
 

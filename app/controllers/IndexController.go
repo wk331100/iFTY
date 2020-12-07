@@ -15,12 +15,34 @@ func (index *IndexController) Index(ctx *fasthttp.RequestCtx){
 	params := request.Input(ctx)
 	name := params.String("name")
 	age := params.Int("age")
+	ids := params.String("ids")
 
-	data := helper.Map{
-		"Name" : name,
-		"Age" : age,
+	filter := helper.Map{}
+	if name != "" {
+		filter["name"] = name
 	}
-	response.Json(data, ctx)
+	if age != 0 {
+		filter["age"] = age
+	}
+	if ids != "" {
+		filter["ids"] = ids
+	}
+
+
+	result := new(models.TestModel).List(filter)
+	fmt.Println(result)
+	response.Json(result, ctx)
+}
+
+func (index *IndexController) Info(ctx *fasthttp.RequestCtx){
+	params := request.Input(ctx)
+	id := params.String("id")
+
+	filter := helper.Map{
+		"id" : id,
+	}
+	result := new(models.TestModel).Info(filter)
+	response.Json(result, ctx)
 }
 
 func (index *IndexController) Post(ctx *fasthttp.RequestCtx){
@@ -28,27 +50,44 @@ func (index *IndexController) Post(ctx *fasthttp.RequestCtx){
 	name := params.String("name")
 	age := params.Int("age")
 	data := helper.Map{
-		"username" : name,
-		"password" : age,
+		"name" : name,
+		"age" : age,
 	}
 	fmt.Println(data)
-	//testData := helper.Map{
-	//	"name" : "abc123",
-	//}
+	result := new(models.TestModel).Insert(data)
+	response.Json(result, ctx)
+
+}
+
+func (index *IndexController) Put(ctx *fasthttp.RequestCtx){
+	params := request.Input(ctx)
+	name := params.String("name")
+	age := params.Int("age")
+	id := params.Int("id")
+
 	update := helper.Map{
-		"name" : "update123",
-		"age" : 16,
+		"name" : name,
+		"age" : age,
 	}
 	filter := helper.Map{
-		"name" : "abc123",
-		"age" : 18,
+		"id" : id,
 	}
-	//new(models.UserModel).Insert(data)
-	//new(models.TestModel).Insert(testData)
-	//new(models.TestModel).Delete(testData)
-	//result := new(models.TestModel).List(filter)
-	//result := new(models.TestModel).Info(filter)
 	result := new(models.TestModel).Update(update, filter)
+	response.Json(result, ctx)
+
+}
+
+
+func (index *IndexController) Delete(ctx *fasthttp.RequestCtx){
+	params := request.Input(ctx)
+	name := params.String("name")
+	age := params.Int("age")
+
+	filter := helper.Map{
+		"name" : name,
+		"age" : age,
+	}
+	result := new(models.TestModel).Delete(filter)
 	response.Json(result, ctx)
 
 }

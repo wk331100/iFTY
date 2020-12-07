@@ -31,7 +31,13 @@ func (this *TestModel) Delete(data helper.Map) bool {
 }
 
 func (this *TestModel) List(where helper.Map) []helper.Map {
-	return this.getInstance().Table(this.table).Where(where).Get()
+	model := this.getInstance().Table(this.table)
+	if where["ids"] != nil {
+		idSlice := helper.Explode(",", where["ids"].(string))
+		delete(where, "ids")
+		model.WhereIn("id", idSlice)
+	}
+	return model.Where(where).Get()
 }
 
 func (this *TestModel) Info(where helper.Map) helper.Map {
