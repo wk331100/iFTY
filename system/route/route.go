@@ -2,6 +2,8 @@ package route
 
 const METHOD_GET = "GET"
 const METHOD_POST = "POST"
+const METHOD_PUT = "PUT"
+const METHOD_DELETE = "DELETE"
 const METHOD_REQUEST = "REQUEST"
 
 type Route struct {
@@ -34,6 +36,14 @@ func (r *Route) Get(path string, function interface{}){
 
 func (r *Route) Post(path string, function interface{}){
 	r.setField(path, function, METHOD_POST)
+}
+
+func (r *Route) Put(path string, function interface{}){
+	r.setField(path, function, METHOD_PUT)
+}
+
+func (r *Route) Delete(path string, function interface{}){
+	r.setField(path, function, METHOD_DELETE)
 }
 
 func (r *Route) Any(path string, function interface{}){

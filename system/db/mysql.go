@@ -16,19 +16,20 @@ const COND_LESS = "<"
 const COND_LESS_OR_EQ = "<="
 const COND_GREATER = ">"
 const COND_GREATER_OR_EQ = ">="
+const COND_IN = "in"
 
 type Mysql struct {
 	//mysql data source name
 	Address string
 	Connector       *sql.DB
 	TableName 	string
-	Filter []Filter
+	Filter []Where
 	Column []interface{}
 	pageSize int
 	page int
 }
 
-type Filter struct {
+type Where struct {
 	key string
 	value interface{}
 	condition string
@@ -90,6 +91,7 @@ func (this *Mysql) Insert(insertData helper.Map) int {
 	marks := helper.Implode(",", mark)
 	sql += "(" + columns + ") VALUES (" + marks + ")"
 
+	fmt.Println(sql)
 	stmt, _ := this.Connector.Prepare(sql)
 	defer stmt.Close()
 
@@ -134,7 +136,7 @@ func (this *Mysql) Update(updateData helper.Map) int {
 
 func (this *Mysql) Delete() bool {
 	sql := "DELETE FROM `" + this.TableName + "` WHERE "
-	if len(this.Filter) < 0 {
+	if len(this.Filter) < 0  {
 		return false
 	}
 	filter, vals := this.parseFilter()
@@ -166,13 +168,9 @@ func (this *Mysql) First() helper.Map {
 	this.pageSize = 1
 	this.page = 1
 	sql, vals := this.buildQuerySQL()
-	fmt.Println(vals)
 	stmt,_ := this.Connector.Prepare(sql)
 	defer stmt.Close()
-	fmt.Println("++++++++++++")
-	fmt.Println(vals)
 	rows, err := stmt.Query(vals...)
-	fmt.Println("===========")
 	if err != nil {
 		fmt.Printf("Select data error: %v\n", err)
 		return nil
@@ -193,8 +191,12 @@ func (this *Mysql) buildQuerySQL() (string, []interface{}){
 		sql += columnStr
 	}
 	filter,vals := this.parseFilter()
-	sql += " FROM `" + this.TableName + "` WHERE " + filter + " " + this.parseLimit()
-	fmt.Println(sql)
+	sql += " FROM `" + this.TableName + "`"
+	if filter != "" {
+		sql += " WHERE " + filter
+	}
+
+	sql += " " + this.parseLimit()
 	return sql, vals
 }
 
@@ -217,7 +219,13 @@ func (this *Mysql) parseResult(rows *sql.Rows) []helper.Map {
 		row := helper.Map{}
 		for k, v := range vals{
 			key := cols[k]
-			row[key] = v
+			switch v.(type) {
+			case []uint8:
+					v := string(v.([]uint8)[:])
+					row[key] = v
+			default:
+				row[key] = v
+			}
 		}
 		result = append(result, row)
 	}
@@ -234,8 +242,18 @@ func (this *Mysql) parseFilter() (string,[]interface{}) {
 	filter := []interface{}{}
 	vals := []interface{}{}
 	for _,item := range this.Filter  {
-		filter = append(filter, fmt.Sprintf("`%s` %s ?",item.key, item.condition))
-		vals = append(vals, item.value)
+		if item.condition != COND_IN {
+			filter = append(filter, fmt.Sprintf("`%s` %s ?",item.key, item.condition))
+			vals = append(vals, item.value)
+		} else {
+			marks := []string{}
+			for _,val :=  range item.value.([]string){
+				marks = append(marks, "?")
+				vals = append(vals, val)
+			}
+			filter = append(filter, fmt.Sprintf("`%s` IN("+ helper.ImplodeString(",", marks)+")",item.key))
+		}
+
 	}
 	return helper.Implode(" AND " , filter), vals
 }
@@ -262,12 +280,22 @@ func (this *Mysql) PageSize (pageSize int) *Mysql {
 
 func (this *Mysql) Where(filter helper.Map) *Mysql {
 	for key,val := range filter  {
-		filterStruct := Filter{
+		filterStruct := Where{
 			key:       key,
 			value:     val,
 			condition: COND_EQ,
 		}
 		this.Filter = append(this.Filter, filterStruct)
 	}
+	return this
+}
+
+func (this *Mysql) WhereIn(key string, InValues []string) *Mysql {
+	filterStruct := Where{
+		key:       key,
+		value:     InValues,
+		condition: COND_IN,
+	}
+	this.Filter = append(this.Filter, filterStruct)
 	return this
 }

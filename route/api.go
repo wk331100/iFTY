@@ -13,8 +13,11 @@ func (api *ApiRoute) Map() []Route.Map {
 
 	//配置静态路由
 	indexController := new(controllers.IndexController)
-	route.Get("/hello", indexController.Index)
-	route.Post("/hello", indexController.Post)
+	route.Get("/test", indexController.Index)
+	route.Get("/info", indexController.Info)
+	route.Post("/test", indexController.Post)
+	route.Put("/test", indexController.Put)
+	route.Delete("/test", indexController.Delete)
 
 	//配置路由组
 	route.Group("/admin", func() {

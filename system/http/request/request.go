@@ -11,10 +11,9 @@ func Input(ctx *fasthttp.RequestCtx) helper.Map {
 	//Query
 	query := string(ctx.URI().QueryString())
 	params := helper.Map{}
-	if len(query) > 0 {
+	if query != "" {
 		parseQuery(query, &params)
 	}
-
 	//Form Data
 	if formData,err := ctx.MultipartForm(); err == nil{
 		for key, item := range (*formData).Value{
@@ -25,7 +24,6 @@ func Input(ctx *fasthttp.RequestCtx) helper.Map {
 			}
 		}
 	}
-
 	//form urlencoded
 	formEncodeString := ctx.PostArgs().String()
 	if formEncodeString != ""{
@@ -43,6 +41,9 @@ func parseQuery(query string, params *helper.Map) helper.Map {
 			b:=strings.Split(val, "=")
 			(*params)[b[0]] = b[1]
 		}
+	} else {
+		b:=strings.Split(query, "=")
+		(*params)[b[0]] = b[1]
 	}
 	return *params
 }
