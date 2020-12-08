@@ -44,3 +44,11 @@ func (this *TestModel) Info(where helper.Map) helper.Map {
 	return this.getInstance().Table(this.table).Where(where).First()
 }
 
+func (this *TestModel) Exist(where helper.Map) bool {
+	info := this.Info(where)
+	if len(info) > 0 {
+		return true
+	}
+	return false
+}
+
