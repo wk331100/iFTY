@@ -1,9 +1,8 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/valyala/fasthttp"
-	"github.com/wk331100/iFTY/app/models"
+	"github.com/wk331100/iFTY/app/services"
 	"github.com/wk331100/iFTY/system/helper"
 	"github.com/wk331100/iFTY/system/http/request"
 	"github.com/wk331100/iFTY/system/http/response"
@@ -11,7 +10,7 @@ import (
 
 type IndexController struct {}
 
-func (index *IndexController) Index(ctx *fasthttp.RequestCtx){
+func (index *IndexController) List(ctx *fasthttp.RequestCtx){
 	params := request.Input(ctx)
 	name := params.String("name")
 	age := params.Int("age")
@@ -28,10 +27,12 @@ func (index *IndexController) Index(ctx *fasthttp.RequestCtx){
 		filter["ids"] = ids
 	}
 
-
-	result := new(models.TestModel).List(filter)
-	fmt.Println(result)
-	response.Json(result, ctx)
+	result,errCode := new(services.TestService).List(filter)
+	if errCode != nil{
+		response.Error(errCode, ctx)
+	} else {
+		response.Json(result, ctx)
+	}
 }
 
 func (index *IndexController) Info(ctx *fasthttp.RequestCtx){
@@ -41,11 +42,15 @@ func (index *IndexController) Info(ctx *fasthttp.RequestCtx){
 	filter := helper.Map{
 		"id" : id,
 	}
-	result := new(models.TestModel).Info(filter)
-	response.Json(result, ctx)
+	result,errCode := new(services.TestService).Info(filter)
+	if errCode != nil{
+		response.Error(errCode, ctx)
+	} else {
+		response.Json(result, ctx)
+	}
 }
 
-func (index *IndexController) Post(ctx *fasthttp.RequestCtx){
+func (index *IndexController) Create(ctx *fasthttp.RequestCtx){
 	params := request.Input(ctx)
 	name := params.String("name")
 	age := params.Int("age")
@@ -53,13 +58,15 @@ func (index *IndexController) Post(ctx *fasthttp.RequestCtx){
 		"name" : name,
 		"age" : age,
 	}
-	fmt.Println(data)
-	result := new(models.TestModel).Insert(data)
-	response.Json(result, ctx)
-
+	result,errCode := new(services.TestService).Create(data)
+	if errCode != nil{
+		response.Error(errCode, ctx)
+	} else {
+		response.Json(result, ctx)
+	}
 }
 
-func (index *IndexController) Put(ctx *fasthttp.RequestCtx){
+func (index *IndexController) Update(ctx *fasthttp.RequestCtx){
 	params := request.Input(ctx)
 	name := params.String("name")
 	age := params.Int("age")
@@ -72,22 +79,26 @@ func (index *IndexController) Put(ctx *fasthttp.RequestCtx){
 	filter := helper.Map{
 		"id" : id,
 	}
-	result := new(models.TestModel).Update(update, filter)
-	response.Json(result, ctx)
-
+	result,errCode := new(services.TestService).Update(update, filter)
+	if errCode != nil{
+		response.Error(errCode, ctx)
+	} else {
+		response.Json(result, ctx)
+	}
 }
 
 
 func (index *IndexController) Delete(ctx *fasthttp.RequestCtx){
 	params := request.Input(ctx)
-	name := params.String("name")
-	age := params.Int("age")
+	id := params.String("id")
 
 	filter := helper.Map{
-		"name" : name,
-		"age" : age,
+		"id" : id,
 	}
-	result := new(models.TestModel).Delete(filter)
-	response.Json(result, ctx)
-
+	result,errCode := new(services.TestService).Delete(filter)
+	if errCode != nil{
+		response.Error(errCode, ctx)
+	} else {
+		response.Json(result, ctx)
+	}
 }

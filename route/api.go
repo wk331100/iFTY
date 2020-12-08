@@ -13,10 +13,10 @@ func (api *ApiRoute) Map() []Route.Map {
 
 	//配置静态路由
 	indexController := new(controllers.IndexController)
-	route.Get("/test", indexController.Index)
+	route.Get("/test", indexController.List)
 	route.Get("/info", indexController.Info)
-	route.Post("/test", indexController.Post)
-	route.Put("/test", indexController.Put)
+	route.Post("/test", indexController.Create)
+	route.Put("/test", indexController.Update)
 	route.Delete("/test", indexController.Delete)
 
 	//配置路由组
