@@ -13,7 +13,7 @@ Now, iFTY Comes!
 
 ## Features
 - Use CSM structure, Controller(C),Model(M),Service(S)
-- Return By Json: {"code":"200", "msg":"success", "data"=[]}
+- Return By Json: {"code":200, "msg":"success", "data"=[]}
 - Strong early warning mechanism (DB, Cache, Script, Error)
 - Support ENV file
 - Support Middleware
