@@ -8,12 +8,16 @@ iFTY Is A HTTP Web Framework Written In Go (Golang). It Based On `FastHTTP` 10x 
 ## Introduction
 Most Golang Fans Written PHP Many Years, When First Change Their Coding Behavior And Habit, Pain Can Only Be Feeled. Completely Ignoring The Advantages Of Golang Itself.
 So, We Need A Framework That Keep the features of PHP language Framework.
-Now, iFTY Comes!
+Now, `iFTY` Comes!
 
 
 ## Features
-- Use CSM structure, Controller(C),Model(M),Service(S)
-- Return By Json: {"code":200, "msg":"success", "data"=[]}
-- Strong early warning mechanism (DB, Cache, Script, Error)
+
+- Based On `FastHTTP`, 10X Faster Than `net/http`
+- Use `Go Mod` Manage Packages
+- Support `Router` And `MiddleWare`
 - Support ENV file
-- Support Middleware
+- Support`CSM` Structure, Controller(C),Model(M),Service(S)
+- Strong early warning mechanism (DB, Cache, Script, Error)
+- Write Golang Code Just Like PHP
+
