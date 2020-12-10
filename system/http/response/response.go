@@ -3,15 +3,15 @@ package response
 import (
 	"encoding/json"
 	"github.com/valyala/fasthttp"
-	"github.com/wk331100/iFTY/app/libs/ErrorCode"
+	"github.com/wk331100/iFTY/app/libs/errorCode"
 	"github.com/wk331100/iFTY/system/helper"
 )
 
 func Json(data interface{}, ctx *fasthttp.RequestCtx)  {
 
 	response := helper.Map{
-		"Code" : ErrorCode.SUCCESS,
-		"Msg" :  ErrorCode.GetErrorMessage(ErrorCode.SUCCESS),
+		"Code" : errorCode.SUCCESS,
+		"Msg" :  errorCode.GetErrorMessage(errorCode.SUCCESS),
 		"Data" : data,
 	}
 	jsonEncode, err := json.Marshal(response)
@@ -21,11 +21,11 @@ func Json(data interface{}, ctx *fasthttp.RequestCtx)  {
 	ctx.Success("application/json", jsonEncode)
 }
 
-func Error(errorCode interface{}, ctx *fasthttp.RequestCtx)  {
+func Error(code interface{}, ctx *fasthttp.RequestCtx)  {
 
 	response := helper.Map{
-		"Code" : errorCode,
-		"Msg" :  ErrorCode.GetErrorMessage(errorCode.(int)),
+		"Code" : code,
+		"Msg" :  errorCode.GetErrorMessage(code.(int)),
 		"Data" : "",
 	}
 	jsonEncode, err := json.Marshal(response)

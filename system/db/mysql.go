@@ -44,8 +44,8 @@ func (this *Mysql) ConnectCluster(cluster string) *Mysql {
 	if mysqlConfig[cluster] == nil {
 		panic("Error Cluster !" )
 	}
-	config := mysqlConfig[cluster].(helper.Map)
-	this.Address = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", config["username"],config["password"],config["host"],config["port"],config["dbname"])
+	conf := mysqlConfig[cluster].(helper.Map)
+	this.Address = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", conf["username"],conf["password"],conf["host"],conf["port"],conf["dbname"])
 	conn, err := sql.Open("mysql", this.Address)
 	this.Connector = conn
 
