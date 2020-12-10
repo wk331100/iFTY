@@ -18,3 +18,20 @@ var MysqlConfig = helper.Map{
 		"dbname" : "blog",
 	},
 }
+
+
+var RedisConfig = helper.Map{
+	"master" : helper.Map{
+		"host" : "192.168.126.100",
+		"port" : 6379,
+		"password" : "dnsadminisverystrong",
+		"db" :  0,
+	},
+	"slave1" : helper.Map{
+		"host" : "192.168.126.100",
+		"port" : 6379,
+		"password" : "",
+		"db" :  0,
+	},
+}
+
