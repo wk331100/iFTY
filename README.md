@@ -17,7 +17,7 @@ Now, `iFTY` Comes!
 - Use `Go Mod` Manage Packages
 - Support `Router` And `MiddleWare`
 - Support ENV file
-- Support`CSM` Structure, Controller(C),Model(M),Service(S)
+- Support`CSM` Structure, Controller(C), Service(S), Model(M)
 - Strong early warning mechanism (DB, Cache, Script, Error)
 - Write Golang Code Just Like PHP
 
