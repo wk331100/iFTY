@@ -53,8 +53,8 @@ go run main.go
 #### Directory Structure
 ```
 - app
-	- controllers   // Controllers For Business logic
-	- middleware    // MiddleWare Before Controller And Response
+    - controllers   // Controllers For Business logic
+    - middleware    // MiddleWare Before Controller And Response
     - libs          // Customer Functions
     - models        // Data Model
     - services      // Service
