@@ -76,7 +76,7 @@ go run main.go
 ```
 route := new(Route.Route)
 
-//配置静态路由
+//Config Static Route
 indexController := new(controllers.IndexController)
 route.Get("/test", indexController.List)
 route.Post("/test", indexController.Create)
@@ -109,6 +109,6 @@ response structure
 {
     "Code": 200,
     "Data": "Hello World",
-    "Msg": "成功"
+    "Msg": "Success"
 }
 ``
