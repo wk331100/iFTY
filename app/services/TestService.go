@@ -28,7 +28,25 @@ func (this *TestService) Info(where helper.Map) (helper.Map , interface{}) {
 		return nil, err
 	}
 
-	redis.Set("a", 123456)
+	redis.Set("a", 444444)
+	redis.HSet("b", map[string]interface{}{"key1" : "123", "key2" : "222", "key3" : "333"})
+	redis.HGet("b", "key1")
+	redis.MSet(map[string]interface{}{"key1" : "111", "key2" : "222"})
+	redis.MGet([]string{"key1", "key2"})
+	redis.Incr("d")
+	redis.Decr("a")
+	redis.SetNX("e", 1 , -1)
+	redis.MSetNX(map[string]interface{}{"f":1, "g":1})
+	redis.Del("d")
+	redis.HDel("b",[]string{"key1","key3"})
+	redis.Exists([]string{"a","b"})
+	redis.HExists("b", "key2")
+	redis.HKeys("b")
+	redis.HLen("b")
+	redis.LPush("queue1", []interface{}{"aaaaaaaaa","eeeeeee"})
+	redis.RPush("queue2", []interface{}{"bbbbbbbbbb","dddddddddd"})
+	redis.RPop("queue1")
+	redis.LPop("queue2")
 
 	a, err := redis.Get("a")
 	if err != nil {
