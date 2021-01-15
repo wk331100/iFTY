@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/valyala/fasthttp"
+	"github.com/wk331100/iFTY/app/libs/errorCode"
 	"github.com/wk331100/iFTY/app/services"
 	"github.com/wk331100/iFTY/system/helper"
 	"github.com/wk331100/iFTY/system/http/request"
@@ -29,7 +30,7 @@ func (index *IndexController) List(ctx *fasthttp.RequestCtx){
 
 	result,errCode := new(services.TestService).List(filter)
 	if errCode != nil{
-		response.Error(errCode, ctx)
+		response.Error(errorCode.SUCCESS, ctx)
 	} else {
 		response.Json(result, ctx)
 	}
