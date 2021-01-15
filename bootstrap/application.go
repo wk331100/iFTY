@@ -6,6 +6,7 @@ import (
 	"github.com/wk331100/iFTY/config"
 	"github.com/wk331100/iFTY/route"
 	"github.com/wk331100/iFTY/system/helper"
+	Mid "github.com/wk331100/iFTY/system/middleware"
 	"strconv"
 )
 
@@ -15,13 +16,19 @@ func (app *Application) bootstrap ()  {
 	//加载系统配置文件
 	configs := config.ServerConfig
 	//加载路由
-	apiRoute := route.ApiRoute{}
-	apiMap := apiRoute.Map()
+	apiMap := new(route.ApiRoute).Map()
+	middlewareMap := new(config.MiddlewareContainer).Map()
 
 	requestHandler := func(ctx *fasthttp.RequestCtx) {
 		fmt.Println("Request: ", string(ctx.Path()), " ", string(ctx.Method()))
 		if len(apiMap) <= 0 {
 			ctx.Error("Unsupported path", fasthttp.StatusNotFound)
+		}
+
+		//执行前置中间件
+		beforeMiddlewareMap := middlewareMap["before"].([]Mid.Map)
+		for _, item := range beforeMiddlewareMap{
+			item.Function.(func(*fasthttp.RequestCtx))(ctx)
 		}
 
 		requestMatch := false
@@ -33,6 +40,12 @@ func (app *Application) bootstrap ()  {
 		}
 		if !requestMatch {
 			ctx.Error("Unsupported path", fasthttp.StatusNotFound)
+		}
+
+		//执行后置中间件
+		afterMiddlewareMap := middlewareMap["after"].([]Mid.Map)
+		for _, item := range afterMiddlewareMap{
+			item.Function.(func(*fasthttp.RequestCtx))(ctx)
 		}
 
 	}
