@@ -22,7 +22,8 @@ func (api *ApiRoute) Map() []Route.Map {
 	//配置路由组
 	route.Group("/admin", func() {
 		userController := new(admin.UserController)
-		route.Get("/getInfo", userController.GetInfo)
+		route.Get("/list", userController.List)
+		route.Get("/test", userController.List)
 		route.Post("/create", userController.Create)
 	})
 	return route.Map

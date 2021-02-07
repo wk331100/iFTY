@@ -2,36 +2,40 @@ package config
 
 import "github.com/wk331100/iFTY/system/helper"
 
-var MysqlConfig = helper.Map{
-	"master" : helper.Map{
-		"host" : "192.168.126.100",
-		"port" : 3306,
-		"username" : "root",
-		"password" : "Wk331100!",
-		"dbname" : "blog",
-	},
-	"slave" : helper.Map{
-		"host" : "192.168.126.100",
-		"port" : 3306,
-		"username" : "root",
-		"password" : "Wk331100!",
-		"dbname" : "blog",
-	},
-}
+var MysqlConfig = helper.Map{}
+var RedisConfig = helper.Map{}
 
+func InitConfig(){
+	MysqlConfig = helper.Map{
+		"master" : helper.Map{
+			"host" : helper.Env("host", "DB_MASTER"),
+			"port" : helper.EnvInt("port", "DB_MASTER"),
+			"username" : helper.Env("username", "DB_MASTER"),
+			"password" : helper.Env("password", "DB_MASTER"),
+			"dbname" : helper.Env("dbname", "DB_MASTER"),
+		},
+		"slave" : helper.Map{
+			"host" : helper.Env("host", "DB_SLAVE"),
+			"port" : helper.EnvInt("port", "DB_SLAVE"),
+			"username" : helper.Env("username", "DB_SLAVE"),
+			"password" : helper.Env("password", "DB_SLAVE"),
+			"dbname" : helper.Env("dbname", "DB_SLAVE"),
+		},
+	}
 
-var RedisConfig = helper.Map{
-	"master" : helper.Map{
-		"host" : "192.168.126.100",
-		"port" : 6379,
-		"password" : "dnsadminisverystrong",
-		"db" :  0,
-	},
-	"slave1" : helper.Map{
-		"host" : "192.168.126.100",
-		"port" : 6379,
-		"password" : "",
-		"db" :  0,
-	},
+	RedisConfig = helper.Map{
+		"master" : helper.Map{
+			"host" : helper.Env("host", "REDIS_MASTER"),
+			"port" : helper.EnvInt("port", "REDIS_MASTER"),
+			"password" : helper.Env("password", "REDIS_MASTER"),
+			"db" :  helper.EnvInt("db", "REDIS_MASTER"),
+		},
+		"slave1" : helper.Map{
+			"host" : helper.Env("host", "REDIS_SLAVE1"),
+			"port" : helper.EnvInt("port", "REDIS_SLAVE1"),
+			"password" : helper.Env("password", "REDIS_SLAVE1"),
+			"db" :  helper.EnvInt("db", "REDIS_SLAVE1"),
+		},
+	}
 }
 

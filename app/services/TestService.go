@@ -11,15 +11,15 @@ import (
 type TestService struct {}
 
 func (this *TestService) Create(data helper.Map) (int, interface{}) {
-	return new(models.TestModel).Insert(data), nil
+	return new(models.TestModel).Instance().Insert(data), nil
 }
 
 func (this *TestService) Update(data, where helper.Map) (int, interface{}) {
-	return new(models.TestModel).Update(data, where), nil
+	return new(models.TestModel).Instance().Update(data, where), nil
 }
 
 func (this *TestService) List(where helper.Map) ([]helper.Map, interface{}) {
-	return new(models.TestModel).List(where), nil
+	return new(models.TestModel).Instance().List(where), nil
 }
 
 func (this *TestService) Info(where helper.Map) (helper.Map , interface{}) {
@@ -59,7 +59,7 @@ func (this *TestService) Info(where helper.Map) (helper.Map , interface{}) {
 
 
 
-	return new(models.TestModel).Info(where), nil
+	return new(models.TestModel).Instance().Info(where), nil
 }
 
 
@@ -70,5 +70,5 @@ func (this *TestService) Delete(filter helper.Map) (bool, interface{}) {
 		return false, errorCode.ERR_NOT_EXIST
 	}
 	//执行删除
-	return testModel.Delete(filter), nil
+	return testModel.Instance().Delete(filter), nil
 }

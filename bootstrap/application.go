@@ -1,10 +1,12 @@
 package bootstrap
 
 import (
+	"flag"
 	"fmt"
 	"github.com/valyala/fasthttp"
 	"github.com/wk331100/iFTY/config"
 	"github.com/wk331100/iFTY/route"
+	"github.com/wk331100/iFTY/system/global"
 	"github.com/wk331100/iFTY/system/helper"
 	Mid "github.com/wk331100/iFTY/system/middleware"
 	"strconv"
@@ -13,6 +15,13 @@ import (
 type Application struct {}
 
 func (app *Application) bootstrap ()  {
+	//设置系统环境
+	flag.StringVar(&global.Env, "e", "dev", "Running Environment")
+	flag.Parse()
+
+	//初始化环境配置
+	config.InitConfig()
+
 	//加载系统配置文件
 	configs := config.ServerConfig
 	//加载路由
@@ -50,7 +59,10 @@ func (app *Application) bootstrap ()  {
 
 	}
 	addr := fmt.Sprintf(":%d", configs["Port"].(int))
-	app.PrintWelcome(configs["Port"].(int))
+	showParams := helper.Map{
+		"port" : configs["Port"].(int),
+	}
+	app.PrintWelcome(showParams)
 	fasthttp.ListenAndServe(addr, requestHandler)
 }
 
@@ -58,12 +70,13 @@ func (app *Application) Run () {
 	app.bootstrap()
 }
 
-func (app *Application) PrintWelcome (port int){
+func (app *Application) PrintWelcome (params helper.Map){
 	fmt.Println("+-------------------------------------------------------+")
 	fmt.Println("|                          iFTY                         |")
 	fmt.Println("|       Is A Web Api Framework Short For Infinity       |")
 	fmt.Println("|-------------------------------------------------------|")
 	fmt.Println("| Status: ",helper.Green("Running!"),"                                    |")
-	fmt.Println("| Listening Port: ", helper.Green(strconv.Itoa(port)), "                                |")
+	fmt.Println("| Listening Port: ", helper.Green(strconv.Itoa(params["port"].(int))), "                                |")
+	fmt.Println("| Running Environment: ", helper.Green(global.Env), "                           |")
 	fmt.Println("+-------------------------------------------------------+")
 }
