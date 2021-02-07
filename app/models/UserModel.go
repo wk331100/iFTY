@@ -7,19 +7,18 @@ import (
 )
 
 type UserModel struct {
-	table string
-	Connector *db.Mysql
+	BaseModel
 }
 
-func (this *UserModel) getInstance() *db.Mysql{
-	this.table = "user"
-	if this.Connector == nil || !this.Connector.IsConnected() {
-		fmt.Println("+++++++++++")
-		this.Connector =  new(db.Mysql).Connect()
-	}
-	return this.Connector
+func (this *UserModel) Instance() *UserModel {
+	this.BaseModel.Table("user")
+	return this
 }
 
-func (this *UserModel) Insert(data helper.Map) int {
-	return this.getInstance().Table(this.table).Insert(data)
+func (this *UserModel) GetTest() []helper.Map {
+	model := this.getInstance(db.SLAVE).Table(this.BaseModel.table)
+	fmt.Println("GetTest: ")
+	return model.PageSize(4).Page(1).Get()
 }
+
+

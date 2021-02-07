@@ -19,7 +19,6 @@ const COND_GREATER_OR_EQ = ">="
 const COND_IN = "in"
 
 type Mysql struct {
-	//mysql data source name
 	Address string
 	Connector       *sql.DB
 	TableName 	string
@@ -45,6 +44,8 @@ func (this *Mysql) ConnectCluster(cluster string) *Mysql {
 		panic("Error Cluster !" )
 	}
 	conf := mysqlConfig[cluster].(helper.Map)
+	fmt.Println(conf)
+
 	this.Address = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", conf["username"],conf["password"],conf["host"],conf["port"],conf["dbname"])
 	conn, err := sql.Open("mysql", this.Address)
 	this.Connector = conn

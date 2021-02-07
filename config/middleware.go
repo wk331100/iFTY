@@ -19,6 +19,8 @@ func (this *MiddlewareContainer) Map() helper.Map {
 func (this *MiddlewareContainer) BeforeMap() []Mid.Map {
 	middleware := new(Mid.Middleware)
 	middleware.Register("before", new(Middleware.Before).Handle)
+	//在这里可以注册更多前置中间件
+
 	return middleware.Map
 }
 
@@ -26,5 +28,7 @@ func (this *MiddlewareContainer) BeforeMap() []Mid.Map {
 func (this *MiddlewareContainer) AfterMap() []Mid.Map {
 	middleware := new(Mid.Middleware)
 	middleware.Register("after", new(Middleware.After).Handle)
+	//在这里可以注册更多后置中间件
+
 	return middleware.Map
 }
