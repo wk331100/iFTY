@@ -70,7 +70,9 @@ func (this *Mysql) Table(table string) *Mysql {
 	appConfig := config.AppConfig
 	this.TableName = table
 	this.page = 1
+	fmt.Println(appConfig)
 	this.pageSize = appConfig["pageSize"].(int)
+	fmt.Println(this.pageSize)
 	return this
 }
 

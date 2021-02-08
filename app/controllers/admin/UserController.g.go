@@ -11,6 +11,7 @@ import (
 type UserController struct {}
 
 func (user *UserController) List(ctx *fasthttp.RequestCtx)  {
+	fmt.Println("++++++++++++++")
 	result,_ :=  new(models.UserModel).Instance().List(helper.Map{})
 	response.Json(result, ctx)
 }
