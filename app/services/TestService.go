@@ -4,28 +4,29 @@ import (
 	"fmt"
 	"github.com/wk331100/iFTY/app/libs/errorCode"
 	"github.com/wk331100/iFTY/app/models"
+	errors "github.com/wk331100/iFTY/system/error"
 	"github.com/wk331100/iFTY/system/helper"
 	"github.com/wk331100/iFTY/system/redis"
 )
 
 type TestService struct {}
 
-func (this *TestService) Create(data helper.Map) (int, interface{}) {
-	return new(models.TestModel).Instance().Insert(data), nil
+func (this *TestService) Create(data helper.Map) (int, errors.Code) {
+	return new(models.TestModel).Instance().Insert(data)
 }
 
-func (this *TestService) Update(data, where helper.Map) (int, interface{}) {
-	return new(models.TestModel).Instance().Update(data, where), nil
+func (this *TestService) Update(data, where helper.Map) (int, errors.Code) {
+	return new(models.TestModel).Instance().Update(data, where)
 }
 
-func (this *TestService) List(where helper.Map) ([]helper.Map, interface{}) {
-	return new(models.TestModel).Instance().List(where), nil
+func (this *TestService) List(where helper.Map) ([]helper.Map, errors.Code) {
+	return new(models.TestModel).Instance().List(where)
 }
 
-func (this *TestService) Info(where helper.Map) (helper.Map , interface{}) {
+func (this *TestService) Info(where helper.Map) (helper.Map , errors.Code) {
 	redis,err := new(redis.Redis).Connect()
 	if err != nil {
-		return nil, err
+		return nil, errors.REDIS_ERROR
 	}
 
 	redis.Set("a", 444444)
@@ -50,7 +51,7 @@ func (this *TestService) Info(where helper.Map) (helper.Map , interface{}) {
 
 	a, err := redis.Get("a")
 	if err != nil {
-		return nil, err
+		return nil, errors.REDIS_ERROR
 	}
 
 	fmt.Println(a)
@@ -59,16 +60,16 @@ func (this *TestService) Info(where helper.Map) (helper.Map , interface{}) {
 
 
 
-	return new(models.TestModel).Instance().Info(where), nil
+	return new(models.TestModel).Instance().Info(where)
 }
 
 
-func (this *TestService) Delete(filter helper.Map) (bool, interface{}) {
+func (this *TestService) Delete(filter helper.Map) (bool, errors.Code) {
 	testModel := new(models.TestModel)
 	//查询是否存在
-	if !testModel.Exist(filter) {
+	if exist,_ := testModel.Exist(filter); !exist {
 		return false, errorCode.ERR_NOT_EXIST
 	}
 	//执行删除
-	return testModel.Instance().Delete(filter), nil
+	return testModel.Instance().Delete(filter)
 }

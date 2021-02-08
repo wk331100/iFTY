@@ -11,12 +11,12 @@ import (
 type UserController struct {}
 
 func (user *UserController) List(ctx *fasthttp.RequestCtx)  {
-	result :=  new(models.UserModel).Instance().List(helper.Map{})
+	result,_ :=  new(models.UserModel).Instance().List(helper.Map{})
 	response.Json(result, ctx)
 }
 
 func (user *UserController) Test(ctx *fasthttp.RequestCtx)  {
-	result :=  new(models.UserModel).Instance().GetTest()
+	result,_ :=  new(models.UserModel).Instance().GetTest()
 	response.Json(result, ctx)
 }
 

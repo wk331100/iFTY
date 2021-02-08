@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"github.com/wk331100/iFTY/system/db"
+	errors "github.com/wk331100/iFTY/system/error"
 	"github.com/wk331100/iFTY/system/helper"
 )
 
@@ -15,7 +16,7 @@ func (this *UserModel) Instance() *UserModel {
 	return this
 }
 
-func (this *UserModel) GetTest() []helper.Map {
+func (this *UserModel) GetTest() ([]helper.Map,errors.Code) {
 	model := this.getInstance(db.SLAVE).Table(this.BaseModel.table)
 	fmt.Println("GetTest: ")
 	return model.PageSize(4).Page(1).Get()
