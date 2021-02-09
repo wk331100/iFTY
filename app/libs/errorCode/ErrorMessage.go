@@ -1,11 +1,13 @@
 package errorCode
 
+import errors "github.com/wk331100/iFTY/system/error"
+
 const(
 	//响应状态码
 	SUCCESS		= 200
 	FAILED		= 201
 
-	//系统内部状态码
+	//通用状态码
 	ERR_UNKNOWN = 1000
 	ERR_DB		= 1001
 	ERR_CACHE	= 1002
@@ -28,9 +30,12 @@ var ErrorCode = map[int]string{
 	ERR_NOT_EXIST 	: "记录不存在",
 }
 
+/**
+ * 获取错误信息： 优先从自定义中取，如果取不到，从系统内置错误码中取
+ */
 func GetErrorMessage(code int) string {
 	if ErrorCode[code] != ""{
 		return ErrorCode[code]
 	}
-	return ""
+	return errors.GetMessage(code, "")
 }

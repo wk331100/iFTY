@@ -8,6 +8,7 @@ import (
 	"github.com/wk331100/iFTY/route"
 	"github.com/wk331100/iFTY/system/global"
 	"github.com/wk331100/iFTY/system/helper"
+	"github.com/wk331100/iFTY/system/log"
 	Mid "github.com/wk331100/iFTY/system/middleware"
 	"strconv"
 )
@@ -22,11 +23,14 @@ func (app *Application) bootstrap ()  {
 	//初始化环境配置
 	config.InitConfig()
 
+	//初始化日志配置
+	log.Init()
+
 	//加载系统配置文件
 	configs := config.ServerConfig
 	//加载路由
 	apiMap := new(route.ApiRoute).Map()
-	middlewareMap := new(config.MiddlewareContainer).Map()
+	middlewareMap := new(MiddlewareContainer).Map()
 
 	requestHandler := func(ctx *fasthttp.RequestCtx) {
 		fmt.Println("Request: ", string(ctx.Path()), " ", string(ctx.Method()))
@@ -58,9 +62,9 @@ func (app *Application) bootstrap ()  {
 		}
 
 	}
-	addr := fmt.Sprintf(":%d", configs["Port"].(int))
+	addr := fmt.Sprintf(":%d", configs["port"].(int))
 	showParams := helper.Map{
-		"port" : configs["Port"].(int),
+		"port" : configs["port"].(int),
 	}
 	app.PrintWelcome(showParams)
 	fasthttp.ListenAndServe(addr, requestHandler)

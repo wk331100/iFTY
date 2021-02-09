@@ -4,6 +4,7 @@ import (
 	"github.com/valyala/fasthttp"
 	"github.com/wk331100/iFTY/app/libs/errorCode"
 	"github.com/wk331100/iFTY/app/services"
+	errors "github.com/wk331100/iFTY/system/error"
 	"github.com/wk331100/iFTY/system/helper"
 	"github.com/wk331100/iFTY/system/http/request"
 	"github.com/wk331100/iFTY/system/http/response"
@@ -29,7 +30,7 @@ func (index *IndexController) List(ctx *fasthttp.RequestCtx){
 	}
 
 	result,errCode := new(services.TestService).List(filter)
-	if errCode != nil{
+	if errCode != errors.EMPTY{
 		response.Error(errorCode.SUCCESS, ctx)
 	} else {
 		response.Json(result, ctx)
@@ -44,7 +45,7 @@ func (index *IndexController) Info(ctx *fasthttp.RequestCtx){
 		"id" : id,
 	}
 	result,errCode := new(services.TestService).Info(filter)
-	if errCode != nil{
+	if errCode != errors.EMPTY{
 		response.Error(errCode, ctx)
 	} else {
 		response.Json(result, ctx)
@@ -60,7 +61,7 @@ func (index *IndexController) Create(ctx *fasthttp.RequestCtx){
 		"age" : age,
 	}
 	result,errCode := new(services.TestService).Create(data)
-	if errCode != nil{
+	if errCode != 0{
 		response.Error(errCode, ctx)
 	} else {
 		response.Json(result, ctx)
@@ -81,7 +82,7 @@ func (index *IndexController) Update(ctx *fasthttp.RequestCtx){
 		"id" : id,
 	}
 	result,errCode := new(services.TestService).Update(update, filter)
-	if errCode != nil{
+	if errCode != errors.EMPTY{
 		response.Error(errCode, ctx)
 	} else {
 		response.Json(result, ctx)
@@ -97,7 +98,7 @@ func (index *IndexController) Delete(ctx *fasthttp.RequestCtx){
 		"id" : id,
 	}
 	result,errCode := new(services.TestService).Delete(filter)
-	if errCode != nil{
+	if errCode != errors.EMPTY{
 		response.Error(errCode, ctx)
 	} else {
 		response.Json(result, ctx)

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/wk331100/iFTY/config"
+	errors "github.com/wk331100/iFTY/system/error"
 	"github.com/wk331100/iFTY/system/helper"
 	"log"
 )
@@ -69,14 +70,16 @@ func (this *Mysql) Table(table string) *Mysql {
 	appConfig := config.AppConfig
 	this.TableName = table
 	this.page = 1
+	fmt.Println(appConfig)
 	this.pageSize = appConfig["pageSize"].(int)
+	fmt.Println(this.pageSize)
 	return this
 }
 
-func (this *Mysql) Insert(insertData helper.Map) int {
+func (this *Mysql) Insert(insertData helper.Map) (int,errors.Code) {
 	sql := "INSERT INTO " + this.TableName
 	if len(insertData) <= 0 {
-		return 0
+		return 0,errors.EMPTY_DATA
 	}
 
 	i, keys := 0, make([]interface{}, len(insertData))
@@ -98,19 +101,19 @@ func (this *Mysql) Insert(insertData helper.Map) int {
 
 	ret, err := stmt.Exec(vals...)
 	if err != nil {
-		fmt.Printf("insert data error: %v\n", err)
-		return 0
+		fmt.Printf(errors.GetMessage(errors.INSERT_ERROR, err.Error()))
+		return 0, errors.INSERT_ERROR
 	}
 	if LastInsertId, err := ret.LastInsertId(); nil == err {
-		return int(LastInsertId)
+		return int(LastInsertId),errors.EMPTY
 	}
-	return 0;
+	return 0,errors.EMPTY
 }
 
-func (this *Mysql) Update(updateData helper.Map) int {
+func (this *Mysql) Update(updateData helper.Map) (int,errors.Code) {
 	sql := "UPDATE `" + this.TableName + "`"
 	if len(updateData) <= 0 {
-		return 0
+		return 0,errors.EMPTY_DATA
 	}
 
 	setter, setVals := this.parseSet(updateData)
@@ -126,19 +129,19 @@ func (this *Mysql) Update(updateData helper.Map) int {
 	fmt.Println(vals)
 	ret, err := stmt.Exec(vals...)
 	if err != nil {
-		fmt.Printf("Delete data error: %v\n", err)
-		return 0
+		fmt.Printf(errors.GetMessage(errors.UPDATE_ERROR, err.Error()))
+		return 0,errors.UPDATE_ERROR
 	}
 	affectedNum, _ := ret.RowsAffected()
-	return int(affectedNum)
+	return int(affectedNum),errors.EMPTY
 }
 
 
 
-func (this *Mysql) Delete() bool {
+func (this *Mysql) Delete() (bool,errors.Code) {
 	sql := "DELETE FROM `" + this.TableName + "` WHERE "
 	if len(this.Filter) < 0  {
-		return false
+		return false,errors.EMPTY_DATA
 	}
 	filter, vals := this.parseFilter()
 	sql += filter
@@ -147,25 +150,25 @@ func (this *Mysql) Delete() bool {
 	defer stmt.Close()
 	_, err := stmt.Exec(vals...)
 	if err != nil {
-		fmt.Printf("Delete data error: %v\n", err)
-		return false
+		fmt.Printf(errors.GetMessage(errors.DELETE_ERROR, err.Error()))
+		return false,errors.DELETE_ERROR
 	}
-	return true
+	return true,errors.EMPTY
 }
 
-func (this *Mysql) Get() []helper.Map {
+func (this *Mysql) Get() ([]helper.Map,errors.Code) {
 	sql, vals := this.buildQuerySQL()
 	stmt,_ := this.Connector.Prepare(sql)
 	defer stmt.Close()
 	rows, err := stmt.Query(vals...)
 	if err != nil {
-		fmt.Printf("Select data error: %v\n", err)
-		return nil
+		fmt.Printf(errors.GetMessage(errors.QUERY_ERROR, err.Error()))
+		return nil,errors.QUERY_ERROR
 	}
-	return this.parseResult(rows)
+	return this.parseResult(rows),errors.EMPTY
 }
 
-func (this *Mysql) First() helper.Map {
+func (this *Mysql) First() (helper.Map,errors.Code) {
 	this.pageSize = 1
 	this.page = 1
 	sql, vals := this.buildQuerySQL()
@@ -173,14 +176,14 @@ func (this *Mysql) First() helper.Map {
 	defer stmt.Close()
 	rows, err := stmt.Query(vals...)
 	if err != nil {
-		fmt.Printf("Select data error: %v\n", err)
-		return nil
+		fmt.Printf(errors.GetMessage(errors.QUERY_ERROR, err.Error()))
+		return nil,errors.QUERY_ERROR
 	}
 	results := this.parseResult(rows)
 	if len(results) > 0 {
-		return results[0]
+		return results[0],errors.EMPTY
 	}
-	return helper.Map{}
+	return nil,errors.EMPTY_DATA
 }
 
 func (this *Mysql) buildQuerySQL() (string, []interface{}){

@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/wk331100/iFTY/system/db"
+	errors "github.com/wk331100/iFTY/system/error"
 	"github.com/wk331100/iFTY/system/helper"
 )
 
@@ -31,19 +32,19 @@ func (this *BaseModel) Table(table string) {
 	this.table = table
 }
 
-func (this *BaseModel) Insert(data helper.Map) int {
+func (this *BaseModel) Insert(data helper.Map) (int,errors.Code) {
 	return this.getInstance(db.MASTER).Table(this.table).Insert(data)
 }
 
-func (this *BaseModel) Update(data, where helper.Map) int {
+func (this *BaseModel) Update(data, where helper.Map) (int,errors.Code) {
 	return this.getInstance(db.MASTER).Table(this.table).Where(where).Update(data)
 }
 
-func (this *BaseModel) Delete(data helper.Map) bool {
+func (this *BaseModel) Delete(data helper.Map) (bool,errors.Code) {
 	return this.getInstance(db.MASTER).Table(this.table).Where(data).Delete()
 }
 
-func (this *BaseModel) List(where helper.Map) []helper.Map {
+func (this *BaseModel) List(where helper.Map) ([]helper.Map,errors.Code) {
 	model := this.getInstance(db.SLAVE).Table(this.table)
 	if where["ids"] != nil {
 		idSlice := helper.Explode(",", where["ids"].(string))
@@ -53,15 +54,15 @@ func (this *BaseModel) List(where helper.Map) []helper.Map {
 	return model.Where(where).Get()
 }
 
-func (this *BaseModel) Info(where helper.Map) helper.Map {
+func (this *BaseModel) Info(where helper.Map) (helper.Map,errors.Code) {
 	return this.getInstance(db.SLAVE).Table(this.table).Where(where).First()
 }
 
-func (this *BaseModel) Exist(where helper.Map) bool {
-	info := this.Info(where)
+func (this *BaseModel) Exist(where helper.Map) (bool,errors.Code) {
+	info,errorCode := this.Info(where)
 	if len(info) > 0 {
-		return true
+		return true,errors.EMPTY
 	}
-	return false
+	return false,errorCode
 }
 
