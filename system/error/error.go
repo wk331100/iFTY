@@ -12,7 +12,11 @@ const (
 
 	EMPTY_DATA   = 20
 	REDIS_ERROR  = 21
+	EMPTY_CONDITION	 = 22
 
+	VALIDATOR_REQUIRED = 50
+	VALIDATOR_TYPE_ERR = 51
+	VALIDATOR_NOT_BETWEEN = 52
 
 
 )
@@ -27,6 +31,11 @@ var Message = map[int]string{
 
 	EMPTY_DATA			: "Empty Data",
 	REDIS_ERROR			: "Redis Error: %v",
+	EMPTY_CONDITION		: "Condition Error",
+
+	VALIDATOR_REQUIRED 	: "%s Is Required",
+	VALIDATOR_TYPE_ERR  : "%s Type Is Not Match",
+	VALIDATOR_NOT_BETWEEN : "%s Not Between The Region",
 }
 
 func GetMessage(code int, error string) string {

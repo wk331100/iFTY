@@ -39,6 +39,11 @@ func Explode(delimiter, str string) []string {
 	return strings.Split(str, delimiter)
 }
 
+func List(delimiter, str string)(string,string) {
+	slice := Explode(delimiter, str)
+	return slice[0],slice[1]
+}
+
 
 func ArrayMerge(ss ...[]interface{}) []interface{} {
 	n := 0
