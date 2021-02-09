@@ -33,4 +33,5 @@ func Error(code interface{}, ctx *fasthttp.RequestCtx)  {
 		panic("Json Encode Error")
 	}
 	ctx.Success("application/json", jsonEncode)
+
 }
