@@ -75,12 +75,27 @@ func (app *Application) Run () {
 }
 
 func (app *Application) PrintWelcome (params helper.Map){
-	fmt.Println("+-------------------------------------------------------+")
+	line := "+-------------------------------------------------------+"
+	fmt.Println(line)
 	fmt.Println("|                          iFTY                         |")
 	fmt.Println("|       Is A Web Api Framework Short For Infinity       |")
-	fmt.Println("|-------------------------------------------------------|")
-	fmt.Println("| Status: ",helper.Green("Running!"),"                                    |")
-	fmt.Println("| Listening Port: ", helper.Green(strconv.Itoa(params["port"].(int))), "                                |")
-	fmt.Println("| Running Environment: ", helper.Green(global.Env), "                           |")
+	fmt.Println(line)
+	len := len(line)
+	status := "| Status: " + helper.Green("Running!")
+	port := "| Listening Port: " + helper.Green(strconv.Itoa(params["port"].(int)))
+	env := "| Running Environment: " + helper.Green(global.Env)
+	fillBlankPrintln(status, len)
+	fillBlankPrintln(port, len)
+	fillBlankPrintln(env, len)
 	fmt.Println("+-------------------------------------------------------+")
+}
+
+func fillBlankPrintln(str string, maxlen int)  {
+	fmt.Print(str)
+	strlen := len(str)
+		for i:=0; i< maxlen - strlen + 10; i++ {
+		fmt.Print(" ")
+	}
+	fmt.Println("|")
+
 }
