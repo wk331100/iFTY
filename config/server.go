@@ -8,6 +8,6 @@ var ServerConfig = map[string]interface{}{
 
 func InitServerConfig()  {
 	ServerConfig = helper.Map{
-		"port" : helper.EnvInt("port", "SERVER"),
+		"port" : helper.EnvInt("server_port", "SERVER"),
 	}
 }
