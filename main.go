@@ -1,12 +1,10 @@
 package main
 
 import (
-	"github.com/wk331100/iFTY/bootstrap"
+	"blog/bootstrap"
 )
 
-func main(){
+func main() {
 	app := bootstrap.Application{}
 	app.Run()
 }
-
-

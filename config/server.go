@@ -1,13 +1,12 @@
 package config
 
-import "github.com/wk331100/iFTY/system/helper"
-
-var ServerConfig = map[string]interface{}{
-	"Port" : 8080,
-}
+var ServerConfig = map[string]interface{}{}
 
 func InitServerConfig()  {
-	ServerConfig = helper.Map{
-		"port" : helper.EnvInt("server_port", "SERVER"),
+	ServerConfig = map[string]interface{}{
+		"port" : 8080,
 	}
 }
+
+
+
