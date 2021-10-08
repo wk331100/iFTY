@@ -1,7 +1,7 @@
 package route
 
 import (
-	"blog/app/controller"
+	"iFTY/app/controller"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

@@ -1,4 +1,4 @@
-module blog
+module iFTY
 
 go 1.16
 

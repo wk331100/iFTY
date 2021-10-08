@@ -1,8 +1,8 @@
 package bootstrap
 
 import (
-	"blog/config"
-	"blog/route"
+	"iFTY/config"
+	"iFTY/route"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"

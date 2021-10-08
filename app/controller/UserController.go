@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"blog/bootstrap/response"
+	"iFTY/bootstrap/response"
 	"fmt"
 	"github.com/gin-gonic/gin"
 )

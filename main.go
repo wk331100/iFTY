@@ -1,7 +1,7 @@
 package main
 
 import (
-	"blog/bootstrap"
+	"iFTY/bootstrap"
 )
 
 func main() {
